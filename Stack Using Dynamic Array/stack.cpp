@@ -1,69 +1,86 @@
 #include <iostream>
 using namespace std;
 
-template <typename T>
-class Stack
+class DynamicStack
 {
 private:
-	int capacity;
 	int top;
-	T* arr;
+	int* arr;
+	int capacity;
 public:
-	Stack() {
-		this->capacity = 10;
-		this->top = -1;
-		arr = new T[this->capacity];
-	}
+	DynamicStack();
+	void push(int x);
+	void pop();
+	bool isEmpty();
+	int peek();
+	void print();
 
-	Stack(int capacity) {
-		this->capacity = capacity;
-		this->top = -1;
-		arr = new T[this->capacity];
-	}
+	void resize() {
+		int newSize = capacity * 2;
+		int* newArr = new int[newSize];
 
-	void push(int x) {
-		if (top < capacity) {
-			top++;
-			arr[top] = x;
-		}
-		else cout << "Stack is full!" << endl;
-	}
-
-	void pop() {
-		if (top == -1) {
-			cout << "There is no element to pop!" << endl;
-			return;
-		}
-		this->top--;
-	}
-
-	void print()
-	{
-		cout << "Stack: ";
-		for (int i = 0; i < this->top + 1; i++)
-		{
-			cout << arr[i] << " ";
-		}
-		cout << endl;
-	}
-
-	int get_top() {
-		return arr[top];
-	}
-
-	bool is_empty() {
-		if (top == -1) {
-			return true;
-		}
-		return false;
+		memcpy(newArr, arr, capacity * sizeof(int));
+		capacity = newSize;
+		delete[] arr;
+		arr = newArr;
 	}
 };
 
+DynamicStack::DynamicStack() {
+	this->top = -1;
+	this->capacity = 10;
+	this->arr = new int[capacity];
+}
+
+void DynamicStack::push(int x) {
+	if (top < capacity - 1) {
+		arr[++top] = x;
+	}
+	else {
+		this->resize();
+		arr[++top] = x;
+	}
+}
+
+void DynamicStack::pop() {
+	if (!isEmpty()) {
+		top--;
+	}
+	else cout << "Stack is empty!" << endl;
+}
+
+bool DynamicStack::isEmpty() {
+	if (top == -1) {
+		return true;
+	}
+	return false;
+}
+
+int DynamicStack::peek() {
+	if (!isEmpty()) {
+		return arr[top];
+	}
+	else cout << "Stack is empty!";
+}
+
+void DynamicStack::print() {
+	for (int i = 0; i < top + 1; i++)
+	{
+		cout << arr[i] << " ";
+	}
+	cout << endl;
+}
+
 int main()
 {
-	Stack<int> a;
-	a.push(2);
-	a.push(2);
-	a.push(2);
+	DynamicStack a;
+	for (int i = 0; i < 20; i++)
+	{
+		a.push(i);
+	}
 	a.print();
+	a.pop();
+	a.print();
+	cout << a.peek() << endl;
+	cout << a.isEmpty() << endl;
 }
