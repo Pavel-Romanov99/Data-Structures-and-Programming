@@ -1,72 +1,84 @@
 #include <iostream>
 #include <stack>
+#include <string>
 using namespace std;
 
 class RPN
 {
 private:
-	const char *expression;
-	stack<char> result;
+	string expression;
+	stack<string> result;
 public:
-	void set_expression(const char* arr)
-	{
-		this->expression = arr;
+	void set_expression(string exp) {
+		this->expression = exp;
 	}
 
-	const char* get_expression()
+	string get_expression()
 	{
-		return expression;
+		return this->expression;
+	}
+
+	string get_num(char a) {
+		switch (a) {
+		case '0': return "0";
+		case '1': return "1";
+		case '2': return "2";
+		case '3': return "3";
+		case '4': return "4";
+		case '5': return "5";
+		case '6': return "6";
+		case '7': return "7";
+		case '8': return "8";
+		case '9': return "9";
+		}
 	}
 
 	void evaluate() {
-		int i = 0;
-		while (expression[i] != '\0') {
 
-
+		for (int i = 0; i < expression.length(); i++)
+		{
 			if (expression[i] >= '0' && expression[i] <= '9') {
-				result.push(expression[i]);
+				result.push(get_num(expression[i]));
 			}
 
 			else {
 				char operation = expression[i];
 				if (operation == '+') {
-					int right = result.top() - '0';
+					double right = stod(result.top());
 					result.pop();
-					int left = result.top() - '0';
+					double left = stod(result.top());
 					result.pop();
-					int temp = left + right;
-					result.push(temp + '0');
+					double temp = left + right;
+					result.push(to_string(temp));
 				}
 				else if (operation == '-') {
-					int right = result.top() - '0';
+					double right = stod(result.top());
 					result.pop();
-					int left = result.top() - '0';
+					double left = stod(result.top());
 					result.pop();
-					int temp = left - right;
-					result.push(temp + '0');
+					double temp = left - right;
+					result.push(to_string(temp));
 				}
 				else if (operation == '*') {
-					int right = result.top() - '0';
+					double right = stod(result.top());
 					result.pop();
-					int left = result.top() - '0';
+					double left = stod(result.top());
 					result.pop();
-					int temp = left * right;
-					result.push(temp + '0');
+					double temp = left * right;
+					result.push(to_string(temp));
 				}
 				else if (operation == '/') {
-					double right = result.top() - '0';
+					double right = stod(result.top());
 					result.pop();
-					double left = result.top() - '0';
+					double left = stod(result.top());
 					result.pop();
 					double temp = left / right;
-					result.push(temp );
+					result.push(to_string(temp));
 				}
 			}
-			i++;
 		}
-
 	}
-	char get_top() {
+	string get_top() {
 		return result.top();
 	}
 };
