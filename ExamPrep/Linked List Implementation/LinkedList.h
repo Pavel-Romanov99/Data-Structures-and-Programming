@@ -13,6 +13,36 @@ public:
 	void removeEnd();
 	void removeAt(int position);
 	int length();
+	void sorting()
+	{
+		node * temphead = head;
+		int temproll;
+		int counter = 0;
+		while (temphead)
+		{
+			temphead = temphead->next;
+			counter++;
+		}
+		temphead = head;
+
+		for (int j = 0; j < counter; j++)
+		{
+			while (temphead->next)  //iterate through list until next is null
+			{
+				if (temphead->data > temphead->next->data)
+				{
+					temproll = temphead->data;
+					temphead->data = temphead->next->data;
+					temphead->next->data = temproll;
+
+					temphead = temphead->next;//increment node
+				}
+				else
+					temphead = temphead->next;//increment node
+			}
+			temphead = head;//reset temphead
+		}
+	}
 };
 
 void LinkedList::addBeginning(int x) {
