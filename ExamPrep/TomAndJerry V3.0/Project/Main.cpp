@@ -172,7 +172,7 @@ int main()
 			{
 				if (line == 1)
 				{
-					file >> num1 >> num2;
+					//file >> num1 >> num2;
 					startX = num1;
 					startY = num2;
 				}
