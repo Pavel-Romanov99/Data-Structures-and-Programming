@@ -3,6 +3,7 @@
 #include <iostream>
 #include <queue>
 #include <string>
+#include <vector>
 using namespace std;
 
 template <typename T>
@@ -48,6 +49,17 @@ public:
 	void addToNodes(node<T>* root, T data);
 	void map1(node<T>* root, T(*f) (T));
 	int accumulate(node<T>* root, T(*f) (T, T, T), int value);
+	bool sameTrees(node<T>* tree1, node<T>* tree2);
+	bool findElement(node<T>* root, T data);
+	node<T>* deleteElement(node<T>* root, T data);
+	node<T>* findMin(node<T>* root);
+	void numbers(BinaryTree<T> a);
+	bool checkFull(node<T>* root);
+	bool checkBalanced(node<T>* root);
+	bool sameStructure(node<T>* tree1, node<T>* tree2);
+	void createByPreorder(vector<int> preorder);
+	int numberElements(node<T>* root);
+	void leaves(node<T>* root);
 };
 
 template<typename T>
@@ -115,17 +127,19 @@ template<typename T>
 void BinaryTree<T>::preOrder(node<T>* root) {
 	if (root == NULL) return;
 
-	cout << root->data << " ";
 	preOrder(root->left);
 	preOrder(root->right);
+	cout << root->data << " ";
+
 }
 
 template<typename T>
 void BinaryTree<T>::postOrder(node<T>* root) {
 	if (root == NULL) return;
-	postOrder(root->left);
 	postOrder(root->right);
 	cout << root->data << " ";
+	postOrder(root->left);
+
 }
 
 template<typename T>
@@ -257,4 +271,156 @@ int BinaryTree<T>::accumulate(node<T>* root, T(*op)(T, T, T), int value) {
 	if (root == nullptr) return value;
 	return (op(root->data, accumulate(root->right, op, value),
 						   accumulate(root->left, op, value)));
+}
+
+//Check whether two trees are the same
+template<typename T>
+bool BinaryTree<T>::sameTrees(node<T>* tree1, node<T>* tree2) {
+	
+	if (tree1 == nullptr && tree2 == nullptr) return true; //if both are empty
+	if (tree1 != NULL && tree2 != NULL) {
+		return tree1->data == tree2->data && sameTrees(tree1->left, tree2->left) &&
+			sameTrees(tree1->right, tree2->right);
+	}
+	return 0; //if one is empty the other is not
+}
+
+//check if an element is in the tree
+template<typename T>
+bool BinaryTree<T>::findElement(node<T>* root, T data) {
+	if (root == NULL) return false;
+	return data == root->data || findElement(root->left, data)
+		|| findElement(root->right, data);
+ }
+
+//delete an element from the tree
+template <typename T>
+node<T>* BinaryTree<T>::findMin(node<T>* root) {
+	node<T>* current = root;
+	while (current->left != NULL) {
+		current = current->left;
+	}
+	return current;
+}
+
+template <typename T>
+node<T>* BinaryTree<T>::deleteElement(node<T>* root, T data) {
+	if (root == NULL) return root; // if tree is empty
+	//these two lines fix the tree
+	else if (data < root->data) root->left = deleteElement(root->left, data);
+	else if (data > root->data) root->right = deleteElement(root->right, data);
+	else {
+		//we have found the element
+		if (root->left == NULL && root->right == NULL) //case 1: no children
+		{
+			delete root;
+			root = NULL;
+		}
+
+		//case 2: Only one child
+		else if (root->left == NULL) {
+			node<T>* temp = root;
+			root = root->right;
+			delete temp;
+		}
+		else if (root->right == NULL) {
+			node<T>* temp = root;
+			root = root->left;
+			delete temp;
+		}
+
+		//case 3: There are two children
+		else {
+			node<T>* temp = findMin(root->right);
+			root->data = temp->data;
+			root->right = deleteElement(root->right, temp->data);
+		}
+	}
+	return root;
+}
+
+//exercise on binary tree
+template<typename T>
+void BinaryTree<T>::numbers(BinaryTree<T> a) {
+	int n;
+	cout << "How many numbers do you want to insert? ";
+	cin >> n;
+	for (int i = 0; i < n; i++)
+	{
+		int num;
+		cin >> num;
+		a.insertNode(a.root, num);
+	}
+	a.inOrder(a.root);
+	int c;
+	cout << "How many numbers do you want to delete? ";
+	cin >> c;
+	for (int i = 0; i < c; i++)
+	{
+		int num;
+		cin >> num;
+		a.deleteElement(a.root, num);
+	}
+	a.inOrder(a.root);
+}
+
+//check if a tree is full
+template <typename T>
+bool BinaryTree<T>::checkFull(node<T>* root) {
+	if (root == NULL) return true;
+	else if (root->left == NULL && root->right == NULL) return true;
+	return root->left != NULL && root->right != NULL &&
+		checkFull(root->left) && checkFull(root->right);
+}
+
+//check if a tree is balanced
+template<typename T>
+bool BinaryTree<T>::checkBalanced(node<T>* root) {
+	if (root == NULL) return false;
+	if (root->left != nullptr && root->right != nullptr) {
+		if (height(root->left) == height(root->right) ||
+			height(root->left) + 1 == height(root->right) ||
+			height(root->left) == height(root->right) + 1)
+			return true;
+	}
+	return false;
+}
+
+//check if two trees have the same structure
+template<typename T>
+bool BinaryTree<T>::sameStructure(node<T>* tree1, node<T>* tree2) {
+	if (tree1 == NULL && tree2 == NULL) return true;
+	return (tree1 != NULL && tree2 != NULL) && sameStructure(tree1->left, tree2->left)
+		&& sameStructure(tree1->right, tree2->right);
+}
+
+//build a tree via a string in a preorder format
+template<typename T>
+void BinaryTree<T>::createByPreorder(vector<int> preorder) {
+	int rootData = preorder[preorder.size() - 1];
+	BinaryTree a(rootData);
+	for (int i = 0; i < preorder.size() - 1; i++)
+	{
+		a.insertNode(a.root, preorder[i]);
+	}
+	a.inOrder(a.root);
+}
+
+//get number of elements in a tree
+template<typename T>
+int BinaryTree<T>::numberElements(node<T>* root) {
+	if (root == NULL) return 0;
+	return (root != NULL) + numberElements(root->left) + 
+		numberElements(root->right);
+}
+
+//prints the leaves in a tree
+template<typename T>
+void BinaryTree<T>::leaves(node<T>* root) {
+	if (root == NULL) return;
+	if (root->left == NULL && root->right == NULL) {
+		cout << root->data << " ";
+	}
+	leaves(root->left);
+	leaves(root->right);
 }
